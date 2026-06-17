@@ -2,6 +2,7 @@
 
     claw-crew list        # show the roster
     claw-crew doctor      # validate config + credentials, flag duplicates
+    claw-crew manifest    # emit Slack app manifest(s) for the crew
     claw-crew provision   # join required/public rooms for every agent
     claw-crew nightly     # cron-friendly audit + heal (doctor + provision)
     claw-crew run         # start every agent (Socket Mode, long-running)
@@ -58,6 +59,51 @@ def cmd_doctor(crew: CrewConfig) -> int:
     return 1 if problems else 0
 
 
+def _dump_manifest(manifest: dict, fmt: str) -> str:
+    if fmt == "json":
+        import json
+
+        return json.dumps(manifest, indent=2)
+    import yaml
+
+    return yaml.safe_dump(manifest, sort_keys=False, default_flow_style=False).rstrip("\n")
+
+
+def cmd_manifest(crew: CrewConfig, handle: str | None, fmt: str, out: str | None) -> int:
+    from pathlib import Path
+
+    from .manifest import manifests_for_crew
+
+    all_manifests = manifests_for_crew(crew)
+    if handle:
+        wanted = handle.lstrip("@")
+        if wanted not in all_manifests:
+            known = ", ".join("@" + h for h in all_manifests)
+            print(f"‼️  Unknown handle '@{wanted}'. Known handles: {known}")
+            return 1
+        selected = {wanted: all_manifests[wanted]}
+    else:
+        selected = all_manifests
+
+    ext = "json" if fmt == "json" else "yaml"
+
+    if out:
+        out_dir = Path(out)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        for h, manifest in selected.items():
+            dest = out_dir / f"{h}.manifest.{ext}"
+            dest.write_text(_dump_manifest(manifest, fmt) + "\n")
+            print(f"  ✅ wrote {dest}")
+        return 0
+
+    for i, (h, manifest) in enumerate(selected.items()):
+        if i:
+            print()
+        print(f"# ===== @{h} (paste into Create New App -> From a manifest) =====")
+        print(_dump_manifest(manifest, fmt))
+    return 0
+
+
 def cmd_provision(crew: CrewConfig, dry_run: bool) -> int:
     reports = provision_crew(crew, dry_run=dry_run)
     label = "DRY-RUN: would join" if dry_run else "joined"
@@ -99,6 +145,12 @@ def main(argv: list[str] | None = None) -> int:
 
     sub.add_parser("list", help="Show the roster")
     sub.add_parser("doctor", help="Validate config + credentials, flag duplicates")
+    p_man = sub.add_parser("manifest", help="Emit Slack app manifest(s) for the crew")
+    p_man.add_argument("--handle", help="Only this agent's handle (default: all agents)")
+    p_man.add_argument(
+        "--format", choices=("yaml", "json"), default="yaml", help="Output format (default: yaml)"
+    )
+    p_man.add_argument("--out", help="Write one file per agent into this directory")
     p_prov = sub.add_parser("provision", help="Join required/public rooms")
     p_prov.add_argument("--dry-run", action="store_true", help="Show actions without making them")
     p_night = sub.add_parser("nightly", help="Cron-friendly audit + heal")
@@ -118,6 +170,8 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.command == "doctor":
         return cmd_doctor(crew)
+    if args.command == "manifest":
+        return cmd_manifest(crew, handle=args.handle, fmt=args.format, out=args.out)
     if args.command == "provision":
         return cmd_provision(crew, dry_run=args.dry_run)
     if args.command == "nightly":

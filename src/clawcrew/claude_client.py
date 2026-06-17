@@ -19,12 +19,21 @@ class ClaudeClient:
         self.max_tokens = max_tokens
         self._client = Anthropic(api_key=api_key or os.environ.get("ANTHROPIC_API_KEY"))
 
-    def reply(self, system_prompt: str, user_text: str) -> str:
+    def reply(
+        self,
+        system_prompt: str,
+        user_text: str,
+        history: list[dict[str, str]] | None = None,
+    ) -> str:
+        # ``history`` is prior {"role", "content"} turns (oldest-first) that are
+        # prepended to the new user turn; None preserves the single-shot default.
+        messages = list(history or [])
+        messages.append({"role": "user", "content": user_text})
         message = self._client.messages.create(
             model=self.model,
             max_tokens=self.max_tokens,
             system=system_prompt,
-            messages=[{"role": "user", "content": user_text}],
+            messages=messages,
         )
         parts = [block.text for block in message.content if getattr(block, "type", None) == "text"]
         return "\n".join(parts).strip() or "(no response)"

@@ -86,8 +86,23 @@ For every agent:
 7. **Display Information → App icon**: upload the agent's headshot from
    `assets/avatars/<handle>.png` (see that folder's README for sizing).
 
-> 15 apps is repetitive but one-time. Use Slack's app **manifest** to clone the
-> scopes/events across apps — paste the manifest, change name/icon, install.
+### Fast path: generate the manifests
+
+15 apps is repetitive, so let `claw-crew` write the manifests for you. A Slack
+**app manifest** carries the scopes/events above, so creating each app becomes
+*Create New App → From a manifest → paste*.
+
+```bash
+claw-crew manifest                       # print every agent's manifest (yaml)
+claw-crew manifest --handle atlas        # just one agent
+claw-crew manifest --format json         # JSON instead of yaml
+claw-crew manifest --out build/manifests # write <handle>.manifest.yaml per agent
+```
+
+For each agent: open https://api.slack.com/apps → **Create New App** → **From a
+manifest**, pick the workspace, paste the generated manifest, and create. Then
+add the App-Level Token (`connections:write`), install to the workspace, upload
+the avatar, and drop both tokens in `.env` (steps 3, 5–7 above).
 
 ## Inter-agent communication
 
