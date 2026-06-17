@@ -20,18 +20,18 @@ def _agent(crew, handle):
 
 def test_build_manifest_names_and_bot_user():
     crew = load_config()
-    atlas = _agent(crew, "atlas")
-    m = build_manifest(atlas, crew)
+    frank = _agent(crew, "frank")
+    m = build_manifest(frank, crew)
 
-    assert m["display_information"]["name"] == atlas.name == "Atlas"
+    assert m["display_information"]["name"] == frank.name == "Frank Costanza"
     bot_user = m["features"]["bot_user"]
-    assert bot_user["display_name"] == atlas.handle
+    assert bot_user["display_name"] == frank.handle
     assert bot_user["always_online"] is True
 
 
 def test_build_manifest_scopes_match_readme():
     crew = load_config()
-    m = build_manifest(_agent(crew, "atlas"), crew)
+    m = build_manifest(_agent(crew, "frank"), crew)
     expected = [
         "app_mentions:read",
         "channels:read",
@@ -48,7 +48,7 @@ def test_build_manifest_scopes_match_readme():
 
 def test_build_manifest_events_and_socket_settings():
     crew = load_config()
-    m = build_manifest(_agent(crew, "atlas"), crew)
+    m = build_manifest(_agent(crew, "frank"), crew)
     settings = m["settings"]
 
     assert m["settings"]["event_subscriptions"]["bot_events"] == ["app_mention", "message.im"]

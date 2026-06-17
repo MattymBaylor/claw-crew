@@ -8,7 +8,7 @@ from clawcrew.config import ConfigError, load_config
 def test_default_roster_loads():
     crew = load_config()
     assert crew.name == "Open Claw"
-    assert len(crew.agents) == 15
+    assert len(crew.agents) == 10
     assert "resources" in crew.required_channels
     assert "huddle" in crew.required_channels
 
