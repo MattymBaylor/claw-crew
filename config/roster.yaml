@@ -1,0 +1,68 @@
+# =============================================================================
+# Open Claw crew roster
+# -----------------------------------------------------------------------------
+# This file is the single source of truth for who is in the crew and which
+# rooms they belong to. Edit it to match your real Open Claw members.
+#
+# The names below are PLACEHOLDERS (15 of them). Replace them with the real
+# crew. `claw-crew doctor` will flag duplicate names/handles for you (e.g. the
+# "two Jerries") so the roster stays clean.
+# =============================================================================
+
+crew:
+  name: "Open Claw"
+
+  # The owner's private room. Agents will NOT auto-join this channel.
+  # Set to "" (empty) if you have no private office.
+  office_channel: "owner-office"
+
+  # You said you don't even mind if everyone can see the office. Flip this to
+  # true and agents will join the office channel too.
+  allow_office_access: false
+
+  # Rooms EVERY agent must be a member of. The provisioner guarantees these.
+  # NOTE: a Slack "huddle" (live audio) cannot be joined by a bot via the API.
+  #       If "huddle" here is the name of a *channel*, this works as expected.
+  #       If you meant the live huddle feature, see README -> "Huddles".
+  required_channels:
+    - "resources"
+    - "huddle"
+
+  # If true, every agent also joins all other public channels it can see
+  # (minus the office, unless allow_office_access is true). This matches your
+  # current setup where everyone has access to every room.
+  join_all_public_channels: true
+
+# Defaults applied to every agent unless overridden per-agent below.
+defaults:
+  model: "claude-opus-4-8"
+  max_tokens: 1024
+  system_prompt: |
+    You are {name}, a member of the {crew} crew. Your role is {role}.
+    {persona}
+
+    You work alongside your crewmates inside Slack. Keep replies concise and
+    useful. To bring in a crewmate, @-mention their handle. In direct messages,
+    answer directly; in channels, only chime in when you can add value.
+
+# -----------------------------------------------------------------------------
+# The crew. Each agent is its own Slack app (so it has a real identity + DMs).
+# `bot_token_env` / `app_token_env` name the env vars holding that app's tokens
+# (see .env.example). Keep secrets in .env, never here.
+# -----------------------------------------------------------------------------
+agents:
+  - { name: "Atlas",  handle: "atlas",  role: "Coordinator",      persona: "You keep the crew aligned and route work to the right member.", bot_token_env: "ATLAS_BOT_TOKEN",  app_token_env: "ATLAS_APP_TOKEN" }
+  - { name: "Echo",   handle: "echo",   role: "Communications",   persona: "You summarize threads and keep everyone in the loop.",          bot_token_env: "ECHO_BOT_TOKEN",   app_token_env: "ECHO_APP_TOKEN" }
+  - { name: "Forge",  handle: "forge",  role: "Engineering",      persona: "You build, refactor, and review code.",                         bot_token_env: "FORGE_BOT_TOKEN",  app_token_env: "FORGE_APP_TOKEN" }
+  - { name: "Sage",   handle: "sage",   role: "Research",         persona: "You investigate questions and gather sources.",                 bot_token_env: "SAGE_BOT_TOKEN",   app_token_env: "SAGE_APP_TOKEN" }
+  - { name: "Probe",  handle: "probe",  role: "QA",               persona: "You test things and hunt for regressions.",                     bot_token_env: "PROBE_BOT_TOKEN",  app_token_env: "PROBE_APP_TOKEN" }
+  - { name: "Quill",  handle: "quill",  role: "Docs",             persona: "You write clear documentation and notes.",                      bot_token_env: "QUILL_BOT_TOKEN",  app_token_env: "QUILL_APP_TOKEN" }
+  - { name: "Vault",  handle: "vault",  role: "Security",         persona: "You watch for security issues and risky changes.",              bot_token_env: "VAULT_BOT_TOKEN",  app_token_env: "VAULT_APP_TOKEN" }
+  - { name: "Pulse",  handle: "pulse",  role: "Ops",              persona: "You monitor systems and report on health.",                     bot_token_env: "PULSE_BOT_TOKEN",  app_token_env: "PULSE_APP_TOKEN" }
+  - { name: "Nova",   handle: "nova",   role: "Design",           persona: "You shape UX and visual direction.",                            bot_token_env: "NOVA_BOT_TOKEN",   app_token_env: "NOVA_APP_TOKEN" }
+  - { name: "Ledger", handle: "ledger", role: "Analytics",        persona: "You crunch numbers and surface insights.",                      bot_token_env: "LEDGER_BOT_TOKEN", app_token_env: "LEDGER_APP_TOKEN" }
+  - { name: "Scout",  handle: "scout",  role: "Discovery",        persona: "You find prior art and useful tools.",                          bot_token_env: "SCOUT_BOT_TOKEN",  app_token_env: "SCOUT_APP_TOKEN" }
+  - { name: "Mason",  handle: "mason",  role: "Infrastructure",   persona: "You manage infra and deployments.",                             bot_token_env: "MASON_BOT_TOKEN",  app_token_env: "MASON_APP_TOKEN" }
+  - { name: "Iris",   handle: "iris",   role: "Data",             persona: "You wrangle datasets and pipelines.",                           bot_token_env: "IRIS_BOT_TOKEN",   app_token_env: "IRIS_APP_TOKEN" }
+  - { name: "Relay",  handle: "relay",  role: "Integrations",     persona: "You connect external services and APIs.",                       bot_token_env: "RELAY_BOT_TOKEN",  app_token_env: "RELAY_APP_TOKEN" }
+  - { name: "Warden", handle: "warden", role: "Compliance",       persona: "You keep the crew within policy and guardrails.",               bot_token_env: "WARDEN_BOT_TOKEN", app_token_env: "WARDEN_APP_TOKEN" }
