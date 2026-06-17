@@ -3,9 +3,16 @@
 Drop one image per agent here, named after the agent's **handle**:
 
 ```
-assets/avatars/atlas.png
-assets/avatars/echo.png
-...
+assets/avatars/frank.png
+assets/avatars/whatley.png
+assets/avatars/mickey.png
+assets/avatars/lloyd.png
+assets/avatars/devola.png
+assets/avatars/bania.png
+assets/avatars/sueellen.png
+assets/avatars/bookman.png
+assets/avatars/steinbrenner.png
+assets/avatars/uncle_leo.png
 ```
 
 The roster points each agent at `assets/avatars/<handle>.png` by default
