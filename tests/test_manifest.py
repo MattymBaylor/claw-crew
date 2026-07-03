@@ -11,27 +11,26 @@ from clawcrew.manifest import (
 )
 
 
-def _agent(crew, handle):
-    for a in crew.agents:
-        if a.handle == handle:
-            return a
-    raise AssertionError(f"no agent with handle {handle!r}")
+def _first_agent(crew):
+    # Roster-agnostic: exercise the builders against whoever is first in the
+    # roster so swapping the crew never breaks these tests.
+    return crew.agents[0]
 
 
 def test_build_manifest_names_and_bot_user():
     crew = load_config()
-    atlas = _agent(crew, "atlas")
-    m = build_manifest(atlas, crew)
+    agent = _first_agent(crew)
+    m = build_manifest(agent, crew)
 
-    assert m["display_information"]["name"] == atlas.name == "Atlas"
+    assert m["display_information"]["name"] == agent.name
     bot_user = m["features"]["bot_user"]
-    assert bot_user["display_name"] == atlas.handle
+    assert bot_user["display_name"] == agent.handle
     assert bot_user["always_online"] is True
 
 
 def test_build_manifest_scopes_match_readme():
     crew = load_config()
-    m = build_manifest(_agent(crew, "atlas"), crew)
+    m = build_manifest(_first_agent(crew), crew)
     expected = [
         "app_mentions:read",
         "channels:read",
@@ -48,7 +47,7 @@ def test_build_manifest_scopes_match_readme():
 
 def test_build_manifest_events_and_socket_settings():
     crew = load_config()
-    m = build_manifest(_agent(crew, "atlas"), crew)
+    m = build_manifest(_first_agent(crew), crew)
     settings = m["settings"]
 
     assert m["settings"]["event_subscriptions"]["bot_events"] == ["app_mention", "message.im"]
