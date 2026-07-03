@@ -3,6 +3,7 @@
     claw-crew list        # show the roster
     claw-crew doctor      # validate config + credentials, flag duplicates
     claw-crew manifest    # emit Slack app manifest(s) for the crew
+    claw-crew slack-bootstrap  # batch-create Slack apps from manifests
     claw-crew provision   # join required/public rooms for every agent
     claw-crew nightly     # cron-friendly audit + heal (doctor + provision)
     claw-crew run         # start every agent (Socket Mode, long-running)
@@ -104,6 +105,50 @@ def cmd_manifest(crew: CrewConfig, handle: str | None, fmt: str, out: str | None
     return 0
 
 
+def cmd_slack_bootstrap(crew: CrewConfig, args) -> int:
+    import os
+
+    from .slack_admin import bootstrap
+
+    token = os.environ.get("SLACK_CONFIG_TOKEN")
+    only = args.only.split(",") if args.only else None
+    skip = args.skip.split(",") if args.skip else None
+
+    if not args.dry_run and not token:
+        print("‼️  No SLACK_CONFIG_TOKEN set.")
+        print("   Generate one at https://api.slack.com/apps -> 'Your App Configuration")
+        print("   Tokens' -> Generate Token, then: export SLACK_CONFIG_TOKEN=xoxe.xoxp-...")
+        print("   (Tip: run with --dry-run first to preview which apps would be created.)")
+        return 1
+
+    results = bootstrap(crew, token, only=only, skip=skip, dry_run=args.dry_run)
+    if not results:
+        print("Nothing to create — every selected agent already has an app (see slack-apps.json).")
+        return 0
+
+    created = 0
+    failures = 0
+    for r in results:
+        if r.skipped_reason == "dry-run":
+            print(f"  DRY-RUN: would create app for @{r.handle} ({r.name})")
+            continue
+        if r.error:
+            print(f"  ‼️  @{r.handle:<10} failed: {r.error}")
+            failures += 1
+            continue
+        created += 1
+        print(f"  ✅ @{r.handle:<10} created {r.app_id}  "
+              f"-> https://api.slack.com/apps/{r.app_id}")
+
+    if created:
+        print("\nFor each app just created, two manual steps remain (Slack has no API):")
+        print("  1. Install App -> Install to Workspace  -> copy xoxb-... into <HANDLE>_BOT_TOKEN")
+        print("  2. Basic Information -> App-Level Tokens -> Generate (connections:write)")
+        print("     -> copy xapp-... into <HANDLE>_APP_TOKEN")
+        print("  Then: claw-crew doctor  (confirms creds)  and  claw-crew run")
+    return 1 if failures else 0
+
+
 def cmd_provision(crew: CrewConfig, dry_run: bool) -> int:
     reports = provision_crew(crew, dry_run=dry_run)
     label = "DRY-RUN: would join" if dry_run else "joined"
@@ -151,6 +196,10 @@ def main(argv: list[str] | None = None) -> int:
         "--format", choices=("yaml", "json"), default="yaml", help="Output format (default: yaml)"
     )
     p_man.add_argument("--out", help="Write one file per agent into this directory")
+    p_boot = sub.add_parser("slack-bootstrap", help="Batch-create Slack apps from manifests")
+    p_boot.add_argument("--only", help="Comma-separated handles to create (default: all remaining)")
+    p_boot.add_argument("--skip", help="Comma-separated handles to skip (e.g. jerry,kramer)")
+    p_boot.add_argument("--dry-run", action="store_true", help="Preview without creating apps")
     p_prov = sub.add_parser("provision", help="Join required/public rooms")
     p_prov.add_argument("--dry-run", action="store_true", help="Show actions without making them")
     p_night = sub.add_parser("nightly", help="Cron-friendly audit + heal")
@@ -172,6 +221,8 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_doctor(crew)
     if args.command == "manifest":
         return cmd_manifest(crew, handle=args.handle, fmt=args.format, out=args.out)
+    if args.command == "slack-bootstrap":
+        return cmd_slack_bootstrap(crew, args)
     if args.command == "provision":
         return cmd_provision(crew, dry_run=args.dry_run)
     if args.command == "nightly":

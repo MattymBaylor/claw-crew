@@ -104,6 +104,25 @@ manifest**, pick the workspace, paste the generated manifest, and create. Then
 add the App-Level Token (`connections:write`), install to the workspace, upload
 the avatar, and drop both tokens in `.env` (steps 3, 5–7 above).
 
+### Faster path: batch-create the apps
+
+Instead of pasting 15 manifests by hand, let Slack's App Manifest API create them
+from a **Slack App Configuration Token** (api.slack.com/apps → *Your App
+Configuration Tokens* → **Generate Token**):
+
+```bash
+export SLACK_CONFIG_TOKEN=xoxe.xoxp-...        # short-lived (~12h)
+claw-crew slack-bootstrap --dry-run            # preview which apps it will create
+claw-crew slack-bootstrap --skip jerry,kramer  # create the rest (skip ones you made)
+```
+
+It creates each app with the right scopes, Messages tab, and Socket Mode, and
+records what it made in `slack-apps.json` (git-ignored) so re-runs never
+duplicate. **Two steps stay manual per app** (Slack has no API for them): *Install
+to Workspace* → copy the `xoxb-…` into `<HANDLE>_BOT_TOKEN`, and *Basic
+Information → App-Level Tokens* → generate (`connections:write`) → copy the
+`xapp-…` into `<HANDLE>_APP_TOKEN`. Then `claw-crew doctor` and `claw-crew run`.
+
 ## Inter-agent communication
 
 Agents talk via **native Slack mentions** — when one agent `@mention`s another's
