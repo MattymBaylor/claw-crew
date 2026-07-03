@@ -22,6 +22,19 @@ class ConfigError(ValueError):
     """Raised when the roster is missing required fields or is malformed."""
 
 
+def _real_token(value: str | None) -> str | None:
+    """Return a token only if it looks real.
+
+    `.env.example` ships placeholder values like ``xoxb-...`` / ``xapp-...``.
+    Copying it to `.env` would otherwise make every agent look credentialed, so
+    treat any value that is empty or still carries the ``...`` placeholder
+    marker as missing.
+    """
+    if not value or "..." in value:
+        return None
+    return value
+
+
 @dataclass(frozen=True)
 class AgentConfig:
     name: str
@@ -37,11 +50,11 @@ class AgentConfig:
 
     @property
     def bot_token(self) -> str | None:
-        return os.environ.get(self.bot_token_env)
+        return _real_token(os.environ.get(self.bot_token_env))
 
     @property
     def app_token(self) -> str | None:
-        return os.environ.get(self.app_token_env)
+        return _real_token(os.environ.get(self.app_token_env))
 
     @property
     def has_credentials(self) -> bool:

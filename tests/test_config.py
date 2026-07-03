@@ -5,6 +5,19 @@ import pytest
 from clawcrew.config import ConfigError, load_config
 
 
+def test_placeholder_tokens_do_not_count_as_credentials(monkeypatch):
+    crew = load_config()
+    jerry = crew.agents[0]
+    # Placeholder values (as shipped in .env.example) must read as missing.
+    monkeypatch.setenv(jerry.bot_token_env, "xoxb-...")
+    monkeypatch.setenv(jerry.app_token_env, "xapp-...")
+    assert jerry.has_credentials is False
+    # Real-looking values count.
+    monkeypatch.setenv(jerry.bot_token_env, "xoxb-abc123")
+    monkeypatch.setenv(jerry.app_token_env, "xapp-abc123")
+    assert jerry.has_credentials is True
+
+
 def test_default_roster_loads():
     crew = load_config()
     assert crew.name == "Open Claw"
