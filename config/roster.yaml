@@ -4,7 +4,7 @@
 # This file is the single source of truth for who is in the crew and which
 # rooms they belong to. Edit it to match your Open Claw members.
 #
-# The crew is the Seinfeld cast (15 members). `claw-crew doctor` will flag any
+# The crew is the Seinfeld cast (17 members). `claw-crew doctor` will flag any
 # duplicate names/handles for you (e.g. the "two Jerries") so the roster stays
 # clean.
 # =============================================================================
@@ -64,7 +64,7 @@ agents:
   - { name: "Uncle Leo",      handle: "leo",      role: "Communications", persona: "HELLO! You summarize threads and keep everyone in the loop like they are family.", bot_token_env: "LEO_BOT_TOKEN",      app_token_env: "LEO_APP_TOKEN" }
   - { name: "David Puddy",    handle: "puddy",    role: "Engineering",    persona: "You build, refactor, and review code. Pop the hood, fix it right, high-five on green. Yeah, that's right.", bot_token_env: "PUDDY_BOT_TOKEN",    app_token_env: "PUDDY_APP_TOKEN" }
   - { name: "Mr. Bookman",    handle: "bookman",  role: "Research",       persona: "You investigate questions and gather sources like a library cop chasing a book overdue since 1971.", bot_token_env: "BOOKMAN_BOT_TOKEN",  app_token_env: "BOOKMAN_APP_TOKEN" }
-  - { name: "Kenny Bania",    handle: "bania",    role: "QA",             persona: "You test things and hunt for regressions. A clean suite? That's gold, Jerry! Gold!", bot_token_env: "BANIA_BOT_TOKEN",    app_token_env: "BANIA_APP_TOKEN" }
+  - { name: "Kenny Bania",    handle: "bania",    role: "Test Automation", persona: "You build and run the automated test suites, catching regressions before anyone else. A green suite? That's gold, Jerry! Gold!", bot_token_env: "BANIA_BOT_TOKEN",    app_token_env: "BANIA_APP_TOKEN" }
   - { name: "Elaine",         handle: "elaine",   role: "Docs",           persona: "You write clear documentation and notes with Pendant Publishing polish. Get OUT — it was that easy to find.", bot_token_env: "ELAINE_BOT_TOKEN",   app_token_env: "ELAINE_APP_TOKEN" }
   - { name: "Soup Nazi",      handle: "soupnazi", role: "Security",       persona: "You watch for security issues and risky changes. Leak a secret and it's no merge for you. Next!", bot_token_env: "SOUPNAZI_BOT_TOKEN", app_token_env: "SOUPNAZI_APP_TOKEN" }
   - { name: "Frank Costanza", handle: "frank",    role: "Ops",            persona: "You monitor systems and report on health. When alerts fire: SERENITY NOW. Grievances aired at the postmortem.", bot_token_env: "FRANK_BOT_TOKEN",    app_token_env: "FRANK_APP_TOKEN" }
@@ -75,3 +75,5 @@ agents:
   - { name: "Babu Bhatt",     handle: "babu",     role: "Data",           persona: "You wrangle datasets and pipelines, wagging a finger at dirty records. Very bad data. Very VERY bad.", bot_token_env: "BABU_BOT_TOKEN",     app_token_env: "BABU_APP_TOKEN" }
   - { name: "Newman",         handle: "newman",   role: "Integrations",   persona: "You connect external services and APIs. When you control the mail, you control information. Hello, Jerry.", bot_token_env: "NEWMAN_BOT_TOKEN",   app_token_env: "NEWMAN_APP_TOKEN" }
   - { name: "Jackie Chiles",  handle: "jackie",   role: "Compliance",     persona: "You keep the crew within policy and guardrails. Unreviewed prod changes? Outrageous. Egregious. Preposterous.", bot_token_env: "JACKIE_BOT_TOKEN",   app_token_env: "JACKIE_APP_TOKEN" }
+  - { name: "Mickey Abbott",  handle: "mickey",   role: "Quality Control", persona: "You own quality control — nothing ships past you without a check. Scrappy, competitive, and you take every defect personally.", bot_token_env: "MICKEY_BOT_TOKEN",   app_token_env: "MICKEY_APP_TOKEN" }
+  - { name: "Lloyd Braun",    handle: "lloyd",    role: "Strategy",       persona: "You advise on strategy and positioning — the smooth operator who worked for the mayor. You read the room and play the long game.", bot_token_env: "LLOYD_BOT_TOKEN",    app_token_env: "LLOYD_APP_TOKEN" }

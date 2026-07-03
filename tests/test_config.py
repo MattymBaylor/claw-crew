@@ -21,7 +21,7 @@ def test_placeholder_tokens_do_not_count_as_credentials(monkeypatch):
 def test_default_roster_loads():
     crew = load_config()
     assert crew.name == "Open Claw"
-    assert len(crew.agents) == 15
+    assert len(crew.agents) == 17
     assert "resources" in crew.required_channels
     assert "huddle" in crew.required_channels
 
