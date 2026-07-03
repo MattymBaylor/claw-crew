@@ -54,6 +54,10 @@ def test_build_manifest_events_and_socket_settings():
     assert list(BOT_EVENTS) == ["app_mention", "message.im"]
     assert settings["socket_mode_enabled"] is True
     assert settings["interactivity"]["is_enabled"] is False
+    # Messages tab must be on and writable so users can DM the bot.
+    app_home = m["features"]["app_home"]
+    assert app_home["messages_tab_enabled"] is True
+    assert app_home["messages_tab_read_only_enabled"] is False
 
 
 def test_manifests_for_crew_one_entry_per_agent():

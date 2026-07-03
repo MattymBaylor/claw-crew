@@ -51,6 +51,14 @@ def build_manifest(agent: AgentConfig, crew: CrewConfig) -> dict:
                 "display_name": agent.handle,
                 "always_online": True,
             },
+            # Turn ON the Messages tab so users can actually DM the bot.
+            # Without this Slack shows "Sending messages to this app has been
+            # turned off." home_tab off; messages tab on and writable.
+            "app_home": {
+                "home_tab_enabled": False,
+                "messages_tab_enabled": True,
+                "messages_tab_read_only_enabled": False,
+            },
         },
         "oauth_config": {
             "scopes": {
