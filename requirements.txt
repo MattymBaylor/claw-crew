@@ -1,0 +1,9 @@
+# Runtime dependencies for the Open Claw crew
+slack-bolt>=1.18,<2
+slack-sdk>=3.27,<4
+anthropic>=0.40
+PyYAML>=6.0
+
+# Dev / CI
+pytest>=8.0
+ruff>=0.6
