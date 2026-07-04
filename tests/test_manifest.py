@@ -35,6 +35,7 @@ def test_build_manifest_scopes_match_readme():
         "app_mentions:read",
         "channels:read",
         "channels:join",
+        "channels:manage",
         "chat:write",
         "im:history",
         "im:read",

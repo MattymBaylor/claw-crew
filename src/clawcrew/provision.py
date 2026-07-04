@@ -93,6 +93,16 @@ def _list_channels(client) -> list[ChannelInfo]:
     return channels
 
 
+def _client(token: str):
+    """WebClient that transparently retries Slack rate-limit (429) responses."""
+    from slack_sdk import WebClient
+    from slack_sdk.http_retry.builtin_handlers import RateLimitErrorRetryHandler
+
+    client = WebClient(token=token)
+    client.retry_handlers.append(RateLimitErrorRetryHandler(max_retry_count=3))
+    return client
+
+
 def provision_agent(agent: AgentConfig, crew: CrewConfig, *, dry_run: bool = False) -> AgentReport:
     report = AgentReport(handle=agent.handle)
 
@@ -100,10 +110,9 @@ def provision_agent(agent: AgentConfig, crew: CrewConfig, *, dry_run: bool = Fal
         report.skipped_no_creds = True
         return report
 
-    from slack_sdk import WebClient
     from slack_sdk.errors import SlackApiError
 
-    client = WebClient(token=agent.bot_token)
+    client = _client(agent.bot_token)
 
     try:
         client.auth_test()
@@ -140,30 +149,34 @@ def provision_crew(crew: CrewConfig, *, dry_run: bool = False) -> list[AgentRepo
 
 
 def leave_channel(crew: CrewConfig, channel_name: str, *, dry_run: bool = False) -> list[str]:
-    """Make every credentialed agent leave ``channel_name``. Returns handles that left.
+    """Ask every credentialed agent to leave ``channel_name``.
 
-    Used to evict the crew from a room they should not be in (e.g. the owner's
-    office after it was joined under a wrong roster name).
+    Returns the handles that left (in dry-run: every agent that would be asked).
+    The channel id is resolved ONCE with a single agent's token; each agent then
+    makes only one conversations.leave call. Per-agent channel listings would
+    trip Slack's Tier-2 rate limit and silently misreport members as absent.
+    Agents that are not in the room are skipped; any other Slack error raises.
     """
-    from slack_sdk import WebClient
     from slack_sdk.errors import SlackApiError
 
+    agents = [a for a in crew.agents if a.has_credentials]
+    if not agents:
+        return []
+
     wanted = channel_name.lstrip("#").strip().lower()
+    lookup = _client(agents[0].bot_token)
+    target = next((c for c in _list_channels(lookup) if c.name.lower() == wanted), None)
+    if target is None:
+        return []
+    if dry_run:
+        return [a.handle for a in agents]
+
     left: list[str] = []
-    for agent in crew.agents:
-        if not agent.has_credentials:
-            continue
-        client = WebClient(token=agent.bot_token)
+    for agent in agents:
         try:
-            target = next(
-                (c for c in _list_channels(client) if c.name.lower() == wanted and c.is_member),
-                None,
-            )
-            if target is None:
-                continue
-            if not dry_run:
-                client.conversations_leave(channel=target.id)
+            _client(agent.bot_token).conversations_leave(channel=target.id)
             left.append(agent.handle)
-        except SlackApiError:
-            continue
+        except SlackApiError as e:
+            if e.response["error"] != "not_in_channel":
+                raise
     return left
