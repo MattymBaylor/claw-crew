@@ -1,3 +1,4 @@
+import json
 import threading
 
 from clawcrew.memory import DEFAULT_MAX_TURNS, ConversationStore
@@ -88,3 +89,82 @@ def test_concurrent_adds_are_safe():
 
     # No lost updates: every add landed exactly once.
     assert len(store.history("c")) == 8 * 200
+
+
+# -- persistence --------------------------------------------------------------
+
+
+def test_persist_and_reload(tmp_path):
+    path = tmp_path / "jerry.json"
+    store = ConversationStore(path=path)
+    store.add("c1", "user", "remember this")
+    store.add("c1", "assistant", "remembered")
+
+    assert path.exists()
+    # A fresh store on the same path recovers the history.
+    reloaded = ConversationStore(path=path)
+    assert reloaded.history("c1") == [
+        {"role": "user", "content": "remember this"},
+        {"role": "assistant", "content": "remembered"},
+    ]
+
+
+def test_no_path_does_not_write(tmp_path):
+    path = tmp_path / "nope.json"
+    store = ConversationStore()  # no path → pure in-memory
+    store.add("c", "user", "hi")
+    store.save()
+    assert not path.exists()
+
+
+def test_clear_persists(tmp_path):
+    path = tmp_path / "m.json"
+    store = ConversationStore(path=path)
+    store.add("c", "user", "hi")
+    store.clear("c")
+    assert ConversationStore(path=path).history("c") == []
+
+
+def test_corrupt_file_starts_empty(tmp_path):
+    path = tmp_path / "bad.json"
+    path.write_text("{ this is not valid json", encoding="utf-8")
+    store = ConversationStore(path=path)  # must not raise
+    assert store.history("c") == []
+    # And the store still works + repairs the file on the next write.
+    store.add("c", "user", "ok now")
+    assert json.loads(path.read_text(encoding="utf-8"))["conversations"]["c"]
+
+
+def test_reload_respects_max_turns(tmp_path):
+    path = tmp_path / "big.json"
+    writer = ConversationStore(path=path)
+    for i in range(10):
+        writer.add("c", "user", f"m{i}")
+    # A store with a smaller cap trims the loaded history to its most recent.
+    reader = ConversationStore(max_turns=3, path=path)
+    assert [t["content"] for t in reader.history("c")] == ["m7", "m8", "m9"]
+
+
+# -- thread inheritance (history_for) -----------------------------------------
+
+
+def test_history_for_merges_parent_then_thread():
+    store = ConversationStore()
+    store.add("chan", "user", "channel context")
+    store.add("chan:123.45", "user", "thread reply")
+    # Parent channel history comes first, then the thread's own turns.
+    assert store.history_for(["chan", "chan:123.45"]) == [
+        {"role": "user", "content": "channel context"},
+        {"role": "user", "content": "thread reply"},
+    ]
+
+
+def test_history_for_dedupes_keys():
+    store = ConversationStore()
+    store.add("chan", "user", "once")
+    assert store.history_for(["chan", "chan"]) == [{"role": "user", "content": "once"}]
+
+
+def test_history_for_missing_keys_is_empty():
+    store = ConversationStore()
+    assert store.history_for(["a", "b"]) == []

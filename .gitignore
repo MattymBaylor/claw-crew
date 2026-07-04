@@ -16,6 +16,9 @@ venv/
 # Local ledger of Slack apps created by `claw-crew slack-bootstrap`
 slack-apps.json
 
+# Persisted per-agent conversation memory (runtime state, lives on the VPS volume)
+data/
+
 # Tooling
 .pytest_cache/
 .ruff_cache/

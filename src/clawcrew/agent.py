@@ -12,7 +12,7 @@ import logging
 import re
 
 from .claude_client import ClaudeClient
-from .config import AgentConfig, CrewConfig
+from .config import AgentConfig, CrewConfig, data_dir
 from .memory import ConversationStore
 
 log = logging.getLogger(__name__)
@@ -25,7 +25,7 @@ def _strip_mentions(text: str) -> str:
 
 
 def _conversation_key(event: dict) -> str:
-    """Derive a stable conversation key from a Slack event.
+    """Derive the *write* key for a Slack event (where new turns are stored).
 
     Keyed by channel id, and further scoped by thread timestamp when the message
     lives in a thread so each thread keeps its own context.
@@ -35,11 +35,27 @@ def _conversation_key(event: dict) -> str:
     return f"{channel}:{thread_ts}" if thread_ts else channel
 
 
+def _history_keys(event: dict) -> list[str]:
+    """Ordered keys whose history feeds a reply, parent scope first.
+
+    A threaded message inherits the parent channel's history as a base, then its
+    own thread turns: ``[channel, channel:thread_ts]``. A non-threaded message
+    just reads the channel/DM key.
+    """
+    channel = event.get("channel", "")
+    thread_ts = event.get("thread_ts")
+    if thread_ts:
+        return [channel, f"{channel}:{thread_ts}"]
+    return [channel]
+
+
 class ClawAgent:
     def __init__(self, agent: AgentConfig, crew: CrewConfig) -> None:
         self.agent = agent
         self.crew = crew
-        self.memory = ConversationStore()
+        # Persist this agent's memory to its own JSON file so it survives
+        # restarts; the directory is a mounted volume on the VPS.
+        self.memory = ConversationStore(path=data_dir() / f"{agent.handle}.json")
         self._app = None
         self._handler = None
 
@@ -63,13 +79,16 @@ class ClawAgent:
             if not prompt:
                 return
             key = _conversation_key(event)
+            history = self.memory.history_for(_history_keys(event))
             try:
-                answer = claude.reply(system_prompt, prompt, history=self.memory.history(key))
+                answer = claude.reply(system_prompt, prompt, history=history)
             except Exception as exc:  # surface failures into the thread, don't crash
                 log.exception("%s failed to reply", self.agent.handle)
                 say(f"({self.agent.name} hit an error: {exc})")
                 return
-            # Only remember exchanges that actually completed.
+            # Only remember exchanges that actually completed. New turns are
+            # written to the specific (thread-scoped) key; reads above inherit
+            # the parent channel's history too.
             self.memory.add(key, "user", prompt)
             self.memory.add(key, "assistant", answer)
             say(answer)

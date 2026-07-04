@@ -18,6 +18,15 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_ROSTER_PATH = REPO_ROOT / "config" / "roster.yaml"
 
 
+def data_dir() -> Path:
+    """Directory where agents persist conversation memory.
+
+    Defaults to ``<repo>/data`` and is overridable via ``CLAW_CREW_DATA_DIR`` so
+    the container can point it at a mounted volume that survives rebuilds.
+    """
+    return Path(os.environ.get("CLAW_CREW_DATA_DIR") or (REPO_ROOT / "data"))
+
+
 class ConfigError(ValueError):
     """Raised when the roster is missing required fields or is malformed."""
 
