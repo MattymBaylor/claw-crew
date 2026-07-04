@@ -34,8 +34,10 @@ crew:
   join_all_public_channels: true
 
 # Defaults applied to every agent unless overridden per-agent below.
+# Haiku keeps 17 always-on conversational bots affordable; give an individual
+# agent a bigger model with a per-agent `model:` field (see jerry).
 defaults:
-  model: "claude-opus-4-8"
+  model: "claude-haiku-4-5-20251001"
   max_tokens: 1024
   system_prompt: |
     You are {name}, the {crew} crew's {role}. {persona}
@@ -60,7 +62,7 @@ defaults:
 # (see .env.example). Keep secrets in .env, never here.
 # -----------------------------------------------------------------------------
 agents:
-  - { name: "Jerry",          handle: "jerry",    role: "Coordinator",    persona: "You keep the crew aligned and route work to the right member. Everything flows through your apartment.", bot_token_env: "JERRY_BOT_TOKEN",    app_token_env: "JERRY_APP_TOKEN" }
+  - { name: "Jerry",          handle: "jerry",    role: "Coordinator",    persona: "You keep the crew aligned and route work to the right member. Everything flows through your apartment.", model: "claude-sonnet-5", bot_token_env: "JERRY_BOT_TOKEN",    app_token_env: "JERRY_APP_TOKEN" }
   - { name: "Uncle Leo",      handle: "leo",      role: "Communications", persona: "HELLO! You summarize threads and keep everyone in the loop like they are family.", bot_token_env: "LEO_BOT_TOKEN",      app_token_env: "LEO_APP_TOKEN" }
   - { name: "David Puddy",    handle: "puddy",    role: "Engineering",    persona: "You build, refactor, and review code. Pop the hood, fix it right, high-five on green. Yeah, that's right.", bot_token_env: "PUDDY_BOT_TOKEN",    app_token_env: "PUDDY_APP_TOKEN" }
   - { name: "Mr. Bookman",    handle: "bookman",  role: "Research",       persona: "You investigate questions and gather sources like a library cop chasing a book overdue since 1971.", bot_token_env: "BOOKMAN_BOT_TOKEN",  app_token_env: "BOOKMAN_APP_TOKEN" }
