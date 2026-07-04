@@ -56,6 +56,7 @@ class AgentConfig:
     max_tokens: int
     system_prompt: str
     avatar: str = ""
+    reports_to: str = ""
 
     @property
     def bot_token(self) -> str | None:
@@ -69,10 +70,26 @@ class AgentConfig:
     def has_credentials(self) -> bool:
         return bool(self.bot_token and self.app_token)
 
-    def rendered_system_prompt(self, crew_name: str) -> str:
-        return self.system_prompt.format(
+    def rendered_system_prompt(self, crew_name: str, directory: str = "") -> str:
+        """Render the prompt template; weave in the crew directory.
+
+        If the template carries a ``{crew_directory}`` placeholder the block is
+        substituted there; otherwise it is appended after the base prompt.
+        """
+        if "{crew_directory}" in self.system_prompt:
+            return self.system_prompt.format(
+                name=self.name,
+                role=self.role,
+                persona=self.persona,
+                crew=crew_name,
+                crew_directory=directory,
+            ).strip()
+        base = self.system_prompt.format(
             name=self.name, role=self.role, persona=self.persona, crew=crew_name
         )
+        if directory:
+            return f"{base.rstrip()}\n\n{directory.strip()}\n"
+        return base
 
 
 @dataclass(frozen=True)
@@ -102,6 +119,46 @@ class CrewConfig:
                     ]
                     out[f"{field_name}:{value}"] = members
         return out
+
+    def directory_block(
+        self,
+        viewer_handle: str | None = None,
+        id_map: dict[str, str] | None = None,
+    ) -> str:
+        """Markdown crew directory injected into every agent's prompt.
+
+        ``id_map`` maps handle -> Slack bot user id (resolved at startup via
+        auth.test) so mentions actually ping; without it we fall back to plain
+        ``@handle`` text. The viewer's own row is marked ``(you)``.
+        """
+        id_map = id_map or {}
+        lines = ["## Crew directory", ""]
+        for a in self.agents:
+            uid = id_map.get(a.handle)
+            mention = f"<@{uid}> (@{a.handle})" if uid else f"@{a.handle}"
+            line = f"- {mention} — {a.name} — {a.role}"
+            if a.reports_to:
+                line += f" — reports to @{a.reports_to}"
+            if viewer_handle and a.handle == viewer_handle:
+                line += " (you)"
+            lines.append(line)
+        lines += [
+            "",
+            "Routing rules:",
+            "- These are the ONLY crew members. Never invent or guess a handle.",
+            "- Not sure who owns something? Ask @jerry to route it.",
+            "- n8n / workflow automation questions go to @kramer.",
+            "- Hand off work by @-mentioning the owner with a one-line brief.",
+        ]
+        return "\n".join(lines)
+
+    def system_prompt_for(
+        self, agent: AgentConfig, id_map: dict[str, str] | None = None
+    ) -> str:
+        """Single entry point: agent prompt + crew directory."""
+        return agent.rendered_system_prompt(
+            self.name, directory=self.directory_block(agent.handle, id_map)
+        )
 
 
 def load_config(path: str | Path | None = None) -> CrewConfig:
@@ -141,6 +198,7 @@ def load_config(path: str | Path | None = None) -> CrewConfig:
                 max_tokens=int(item.get("max_tokens", default_max_tokens)),
                 system_prompt=item.get("system_prompt", default_prompt),
                 avatar=item.get("avatar", f"assets/avatars/{handle}.png"),
+                reports_to=str(item.get("reports_to", "") or ""),
             )
         )
 

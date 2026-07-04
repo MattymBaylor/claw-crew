@@ -50,9 +50,15 @@ def _history_keys(event: dict) -> list[str]:
 
 
 class ClawAgent:
-    def __init__(self, agent: AgentConfig, crew: CrewConfig) -> None:
+    def __init__(
+        self,
+        agent: AgentConfig,
+        crew: CrewConfig,
+        id_map: dict[str, str] | None = None,
+    ) -> None:
         self.agent = agent
         self.crew = crew
+        self.id_map = id_map or {}
         # Persist this agent's memory to its own JSON file so it survives
         # restarts; the directory is a mounted volume on the VPS.
         self.memory = ConversationStore(path=data_dir() / f"{agent.handle}.json")
@@ -66,7 +72,7 @@ class ClawAgent:
         from slack_bolt import App
 
         app = App(token=self.agent.bot_token)
-        system_prompt = self.agent.rendered_system_prompt(self.crew.name)
+        system_prompt = self.crew.system_prompt_for(self.agent, self.id_map)
         claude = self._claude()
 
         def respond(event: dict, say) -> None:
