@@ -59,6 +59,21 @@ def _strip_mentions(text: str) -> str:
     return _MENTION_RE.sub("", text or "").strip()
 
 
+def _linkify_mentions(text: str, id_map: dict) -> str:
+    """Turn bare user IDs and plain @handles into real Slack mentions.
+
+    Models drop the <> brackets or write @kramer as plain text — neither
+    pings. This net converts '@U0ABC...' -> '<@U0ABC...>' and '@handle' ->
+    '<@ID>' for known crew handles, so inter-agent convocations always fire.
+    """
+    if not text:
+        return text
+    text = re.sub(r"(?<!<)@(U[A-Z0-9]{8,})\b", r"<@\1>", text)
+    for handle, uid in sorted((id_map or {}).items(), key=lambda kv: -len(kv[0])):
+        text = re.sub(rf"(?<!\w)@{re.escape(handle)}\b", f"<@{uid}>", text, flags=re.IGNORECASE)
+    return text
+
+
 def _conversation_key(event: dict) -> str:
     """Derive the *write* key for a Slack event (where new turns are stored).
 
@@ -134,7 +149,7 @@ class ClawAgent:
             # the parent channel's history too.
             self.memory.add(key, "user", prompt)
             self.memory.add(key, "assistant", answer)
-            say(answer)
+            say(_linkify_mentions(answer, self.id_map))
 
         @app.event("app_mention")
         def _on_mention(event, say):
