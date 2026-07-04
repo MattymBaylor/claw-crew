@@ -15,7 +15,7 @@ APPROVED = {
     "davola": "jerry",
     "bania": "elaine",
     "peterman": "elaine",
-    "george": "elaine",
+    "george": "whatley",
     "kramer": "whatley",
     "morty": "whatley",
     "newman": "whatley",
