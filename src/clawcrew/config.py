@@ -150,7 +150,15 @@ class CrewConfig:
             "- n8n / workflow automation questions go to @kramer.",
             "- Hand off work by @-mentioning the owner with a one-line brief.",
             "- Every project handoff or stage change ALSO gets reported to @davola",
-            "  as: PROJECT | stage | owner | timestamp — he keeps the master log.",
+            "  as: PROJECT | stage | owner — the log stamps the real time",
+            "  automatically. NEVER guess or invent dates.",
+            "Truth rules:",
+            "- Posts from @openclaw are the legacy platform's scheduled lanes —",
+            "  they are NOT your own actions or memories, even when they carry a",
+            "  crew member's name.",
+            "- Never claim memory of work you don't actually remember. If something",
+            "  is attributed to you that you can't recall, say so plainly and point",
+            "  to the Davola Log — playing along corrupts the record.",
         ]
         return "\n".join(lines)
 
