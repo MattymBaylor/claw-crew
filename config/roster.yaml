@@ -14,7 +14,7 @@ crew:
 
   # The owner's private room. Agents will NOT auto-join this channel.
   # Set to "" (empty) if you have no private office.
-  office_channel: "owner-office"
+  office_channel: "matts-office"
 
   # You said you don't even mind if everyone can see the office. Flip this to
   # true and agents will join the office channel too.
