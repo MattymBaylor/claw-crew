@@ -101,6 +101,14 @@ class CrewConfig:
     join_all_public_channels: bool
     agents: tuple[AgentConfig, ...] = field(default_factory=tuple)
 
+    def directory(self) -> str:
+        """One line per crew member — handle, name, role — for system prompts.
+
+        Injected into every agent's prompt so each bot knows who does what and
+        can route work to real crewmates instead of guessing at names.
+        """
+        return "\n".join(f"- @{a.handle} ({a.name}) — {a.role}" for a in self.agents)
+
     def duplicates(self) -> dict[str, list[str]]:
         """Return duplicate names/handles so the roster can be cleaned up.
 
