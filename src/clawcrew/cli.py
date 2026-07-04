@@ -202,6 +202,9 @@ def main(argv: list[str] | None = None) -> int:
     p_boot.add_argument("--dry-run", action="store_true", help="Preview without creating apps")
     p_prov = sub.add_parser("provision", help="Join required/public rooms")
     p_prov.add_argument("--dry-run", action="store_true", help="Show actions without making them")
+    p_leave = sub.add_parser("leave", help="Make every agent leave a channel")
+    p_leave.add_argument("channel", help="Channel name to leave (e.g. matts-office)")
+    p_leave.add_argument("--dry-run", action="store_true", help="Preview without leaving")
     p_night = sub.add_parser("nightly", help="Cron-friendly audit + heal")
     p_night.add_argument("--dry-run", action="store_true")
     sub.add_parser("run", help="Start every agent (long-running)")
@@ -225,6 +228,16 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_slack_bootstrap(crew, args)
     if args.command == "provision":
         return cmd_provision(crew, dry_run=args.dry_run)
+    if args.command == "leave":
+        from .provision import leave_channel
+
+        left = leave_channel(crew, args.channel, dry_run=args.dry_run)
+        label = "DRY-RUN: would leave" if args.dry_run else "left"
+        if left:
+            print(f"  {label} #{args.channel.lstrip('#')}: {', '.join('@' + h for h in left)}")
+        else:
+            print(f"  Nobody is in #{args.channel.lstrip('#')} (or no credentials set).")
+        return 0
     if args.command == "nightly":
         return cmd_nightly(crew, dry_run=args.dry_run)
     if args.command == "run":

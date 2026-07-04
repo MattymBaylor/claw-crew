@@ -137,3 +137,33 @@ def provision_agent(agent: AgentConfig, crew: CrewConfig, *, dry_run: bool = Fal
 
 def provision_crew(crew: CrewConfig, *, dry_run: bool = False) -> list[AgentReport]:
     return [provision_agent(agent, crew, dry_run=dry_run) for agent in crew.agents]
+
+
+def leave_channel(crew: CrewConfig, channel_name: str, *, dry_run: bool = False) -> list[str]:
+    """Make every credentialed agent leave ``channel_name``. Returns handles that left.
+
+    Used to evict the crew from a room they should not be in (e.g. the owner's
+    office after it was joined under a wrong roster name).
+    """
+    from slack_sdk import WebClient
+    from slack_sdk.errors import SlackApiError
+
+    wanted = channel_name.lstrip("#").strip().lower()
+    left: list[str] = []
+    for agent in crew.agents:
+        if not agent.has_credentials:
+            continue
+        client = WebClient(token=agent.bot_token)
+        try:
+            target = next(
+                (c for c in _list_channels(client) if c.name.lower() == wanted and c.is_member),
+                None,
+            )
+            if target is None:
+                continue
+            if not dry_run:
+                client.conversations_leave(channel=target.id)
+            left.append(agent.handle)
+        except SlackApiError:
+            continue
+    return left
