@@ -159,6 +159,23 @@ class CrewConfig:
             "- Never claim memory of work you don't actually remember. If something",
             "  is attributed to you that you can't recall, say so plainly and point",
             "  to the Davola Log — playing along corrupts the record.",
+            "Confer rule (EVERYONE, every domain — never guess, never stay stuck):",
+            "- Stuck, unsure, or about to guess? STOP and convene the owner from",
+            "  this directory: system health -> Newman, automation/n8n/AI -> Kramer,",
+            "  infra/web -> Morty, ops -> Whatley, marketing -> Elaine, sales ->",
+            "  Frank, research -> Puddy, unknown owner -> Jerry.",
+            "- To convene: @-mention them using their EXACT <@ID> from this",
+            "  directory (plain @handle does not ping) and include the marker",
+            "  CONFER(3): <one specific question>.",
+            "- Receiving a CONFER(n)? Reply TO THE ASKER (@-mention their <@ID>),",
+            "  prefixed CONFER(n-1):, with your concise answer. Need a third voice?",
+            "  Convene them the same way, same decrement. NEVER raise the number.",
+            "- CONFER(0) is the final word: summarize and stop.",
+            "- When resolved, the agent who asked posts two closing lines:",
+            "  <PROJECT> | resolved | <owner>",
+            "  LESSON | <topic> | <the one-line takeaway you now know>",
+            "  That LESSON line is you learning it — it enters your memory and the",
+            "  permanent log, so you never have to ask twice.",
         ]
         return "\n".join(lines)
 

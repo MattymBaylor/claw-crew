@@ -70,8 +70,13 @@ deliberately **deactivated** — do not reactivate or re-invite them.
 1. **Models (cost):** crew default is `claude-haiku-4-5-20251001`; only jerry
    runs `claude-sonnet-5`. This was a ~30x API cost cut. Do not put the crew
    back on Opus.
-2. **Bot-loop guard:** agents ignore ALL bot-authored messages (bot_id /
-   bot_message). Prevents credit-burning loops with the gateway. Keep it.
+2. **Bot-loop guard (amended by Matt 7/4 evening — CONFER exception):** agents
+   ignore ALL bot-authored messages EXCEPT bounded CONFER convocations: the
+   message must carry CONFER(n) with 1<=n<=3, come from a VERIFIED crew bot
+   (runtime id_map), and each agent answers max 3 bot-triggered turns per
+   thread per hour (hard-capped in code, `_confer_gate` in agent.py). Gateway
+   and non-crew bot posts remain fully ignored. Do not widen this exception
+   without Matt.
 3. **Office privacy:** `office_channel: "matts-office"` — the crew must NOT
    be in that channel. They were evicted manually; `claw-crew leave` exists
    for future evictions (needs `channels:manage`, which only newly generated

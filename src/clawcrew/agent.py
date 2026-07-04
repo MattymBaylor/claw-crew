@@ -18,6 +18,41 @@ from .memory import ConversationStore
 log = logging.getLogger(__name__)
 
 _MENTION_RE = re.compile(r"<@[A-Z0-9]+>")
+CONFER_RE = re.compile(r"CONFER\((\d)\)", re.IGNORECASE)
+
+
+def _confer_gate(event: dict, id_map: dict, own_handle: str, confer_log: dict, now: float | None = None) -> bool:
+    """Bot-loop guard with one bounded exception: CONFER convocations.
+
+    All bot-authored messages are ignored (loop guard, deliberate) UNLESS the
+    message carries an explicit CONFER(n) marker with 1 <= n <= 3, was sent by
+    a VERIFIED crew bot (id_map from auth.test), is not our own message, and
+    this agent has answered fewer than 3 bot-triggered turns in this thread in
+    the last hour (hard rate cap). Approved by Matt 2026-07-04 so the crew can
+    work problems together without credit-burn loops.
+    """
+    import time as _time
+    if not (event.get("bot_id") or event.get("subtype") == "bot_message"):
+        return True  # human message — always allowed
+    m = CONFER_RE.search(event.get("text") or "")
+    if not m:
+        return False
+    n = int(m.group(1))
+    if n < 1 or n > 3:
+        return False
+    sender = event.get("user") or (event.get("bot_profile") or {}).get("user_id")
+    if not sender or sender not in set(id_map.values()):
+        return False
+    if sender == id_map.get(own_handle):
+        return False
+    now = now if now is not None else _time.time()
+    key = f"{event.get('channel', '')}:{event.get('thread_ts') or ''}"
+    window = [t for t in confer_log.get(key, []) if now - t < 3600]
+    if len(window) >= 3:
+        return False
+    window.append(now)
+    confer_log[key] = window
+    return True
 
 
 def _strip_mentions(text: str) -> str:
@@ -59,6 +94,7 @@ class ClawAgent:
         self.agent = agent
         self.crew = crew
         self.id_map = id_map or {}
+        self._confer_log: dict = {}
         # Persist this agent's memory to its own JSON file so it survives
         # restarts; the directory is a mounted volume on the VPS.
         self.memory = ConversationStore(path=data_dir() / f"{agent.handle}.json")
@@ -76,10 +112,11 @@ class ClawAgent:
         claude = self._claude()
 
         def respond(event: dict, say) -> None:
-            # Never engage with bot-authored messages. The whole crew plus the
-            # OpenClaw gateway share every room, so bot-to-bot replies can
-            # cascade into mention loops that burn API credits.
-            if event.get("bot_id") or event.get("subtype") == "bot_message":
+            # Bot-loop guard (deliberate): bot-authored messages are ignored,
+            # EXCEPT bounded CONFER(n) convocations from verified crew bots —
+            # see _confer_gate. Prevents credit-burning mention loops while
+            # letting the crew confer on real problems.
+            if not _confer_gate(event, self.id_map, self.agent.handle, self._confer_log):
                 return
             prompt = _strip_mentions(event.get("text", ""))
             if not prompt:
