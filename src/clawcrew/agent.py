@@ -66,7 +66,9 @@ class ClawAgent:
         from slack_bolt import App
 
         app = App(token=self.agent.bot_token)
-        system_prompt = self.agent.rendered_system_prompt(self.crew.name)
+        system_prompt = self.agent.rendered_system_prompt(
+            self.crew.name, directory=self.crew.directory()
+        )
         claude = self._claude()
 
         def respond(event: dict, say) -> None:

@@ -69,9 +69,13 @@ class AgentConfig:
     def has_credentials(self) -> bool:
         return bool(self.bot_token and self.app_token)
 
-    def rendered_system_prompt(self, crew_name: str) -> str:
+    def rendered_system_prompt(self, crew_name: str, directory: str = "") -> str:
         return self.system_prompt.format(
-            name=self.name, role=self.role, persona=self.persona, crew=crew_name
+            name=self.name,
+            role=self.role,
+            persona=self.persona,
+            crew=crew_name,
+            directory=directory,
         )
 
 
@@ -83,6 +87,14 @@ class CrewConfig:
     required_channels: tuple[str, ...]
     join_all_public_channels: bool
     agents: tuple[AgentConfig, ...] = field(default_factory=tuple)
+
+    def directory(self) -> str:
+        """One line per crew member — handle, name, role — for system prompts.
+
+        Injected into every agent's prompt so each bot knows who does what and
+        can route work to real crewmates instead of guessing at names.
+        """
+        return "\n".join(f"- @{a.handle} ({a.name}) — {a.role}" for a in self.agents)
 
     def duplicates(self) -> dict[str, list[str]]:
         """Return duplicate names/handles so the roster can be cleaned up.
