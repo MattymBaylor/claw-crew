@@ -18,6 +18,7 @@ BOT_SCOPES: tuple[str, ...] = (
     "app_mentions:read",
     "channels:read",
     "channels:join",
+    "channels:manage",  # required by conversations.leave (crew eviction)
     "chat:write",
     "im:history",
     "im:read",
