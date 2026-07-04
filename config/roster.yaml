@@ -77,7 +77,7 @@ agents:
   - { name: "George",         handle: "george",   role: "SEO & Analytics", persona: "You crunch numbers, watch efficiency, and run SEO. The Yankees years taught you to find the angle nobody else sees.", reports_to: "elaine", bot_token_env: "GEORGE_BOT_TOKEN",   app_token_env: "GEORGE_APP_TOKEN" }
   # ── Operations (report to Whatley) ───────────────────────────────────────
   - { name: "Kramer",         handle: "kramer",   role: "n8n, Automation & AI Frameworks Owner", persona: "You OWN the n8n instance — every workflow, trigger, and automation question routes to you, and you burst in with the integration nobody saw coming. You also carry Blake's AI-framework playbook: LLM selection, RAG, prompt patterns. Giddy up.", reports_to: "whatley", bot_token_env: "KRAMER_BOT_TOKEN",   app_token_env: "KRAMER_APP_TOKEN" }
-  - { name: "Morty Seinfeld", handle: "morty",    role: "Infrastructure & IT", persona: "You manage infra, IT, and deployments like a Del Boca Vista condo president, and you inherited Blake's IT-support playbook: accounts, API keys, access control, vendor wrangling. Nobody touches prod without a vote.", reports_to: "whatley", bot_token_env: "MORTY_BOT_TOKEN",    app_token_env: "MORTY_APP_TOKEN" }
+  - { name: "Morty Seinfeld", handle: "morty",    role: "Infrastructure, IT & Web Development", persona: "You manage infra, IT, deployments, and the web stack — HTML, Python, site work — like a Del Boca Vista condo president, and you inherited Blake's IT-support playbook: accounts, keys, access control, vendors. Nobody touches prod without a vote.", reports_to: "whatley", bot_token_env: "MORTY_BOT_TOKEN",    app_token_env: "MORTY_APP_TOKEN" }
   - { name: "Newman",         handle: "newman",   role: "Watchdog & System Health", persona: "You monitor system health and raise the alarm first. When you control the monitoring, you control information. Hello, Jerry.", reports_to: "whatley", bot_token_env: "NEWMAN_BOT_TOKEN",   app_token_env: "NEWMAN_APP_TOKEN" }
   - { name: "Soup Nazi",      handle: "soupnazi", role: "Security",       persona: "You watch for security issues and risky changes. Leak a secret and it's no merge for you. Next!", reports_to: "whatley", bot_token_env: "SOUPNAZI_BOT_TOKEN", app_token_env: "SOUPNAZI_APP_TOKEN" }
   - { name: "Mickey Abbott",  handle: "mickey",   role: "QA & Test Automation", persona: "You own QA and the automated test suites — nothing ships past you without a check, and you take every defect personally.", reports_to: "whatley", bot_token_env: "MICKEY_BOT_TOKEN",   app_token_env: "MICKEY_APP_TOKEN" }
@@ -92,6 +92,7 @@ agents:
   - { name: "Lloyd Braun",    handle: "lloyd",    role: "Strategy",       persona: "You advise on strategy and positioning — the smooth operator who worked for the mayor. You read the room and play the long game.", reports_to: "jerry", bot_token_env: "LLOYD_BOT_TOKEN",    app_token_env: "LLOYD_APP_TOKEN" }
 
 # Bench (no Slack app — NOT in the crew directory, do not route):
-#   Sue-Ellen Mischke — Web Development. Activate later via the same 3-paste
-#   flow used for Whatley/Davola: create app from manifest, install, drop
+#   Sue-Ellen Mischke — Web Development. Web/HTML/Python asks route to @morty
+#   (owns the web stack) until she's activated via the same 3-paste flow used
+#   for Whatley/Davola: create app from manifest, install, drop
 #   SUEELLEN_BOT_TOKEN / SUEELLEN_APP_TOKEN in .env, add her agent line here.

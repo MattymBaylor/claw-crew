@@ -7,8 +7,9 @@ him explicitly._
 ## The big picture: TWO separate systems, one Slack workspace
 
 The Slack workspace (**Growthmindset**) contains exactly:
-**1 human** (Matt Martelli, Primary Workspace Owner) + **17 crew bot apps** +
-**1 OpenClaw Gateway app**. Nothing else should be a member. 14 old
+**1 human** (Matt Martelli, Primary Workspace Owner) + **19 crew bot apps**
+(incl. Whatley + Davola, added 2026-07-04 PM) + **1 OpenClaw Gateway app**
+(+ pre-existing Claude & Notion apps). Nothing else should be a member. 14 old
 character-named USER accounts (Jerry Seinfeld, Cosmo Kramer, etc.) were
 deliberately **deactivated** — do not reactivate or re-invite them.
 
@@ -38,17 +39,25 @@ deliberately **deactivated** — do not reactivate or re-invite them.
 
 ### System 2 — claw-crew (the Seinfeld crew, built 2026-07-03/04)
 - Repo: `github.com/MattymBaylor/claw-crew`, **`main` is the source of
-  truth** — all work is merged (PRs #1–#8), 47 tests green.
+  truth** — all work merged (PRs #1–#9 + the 2026-07-04 PM org/branch
+  reconciliation), 52 tests green.
 - Runs 24/7 as its own Docker container on the SAME VPS, project at
   `/opt/claw-crew` (separate compose project — do not merge it into
   /opt/openclaw's compose).
-- 17 agents, each its own Slack Socket Mode app with its own `xoxb-`/`xapp-`
-  tokens in `/opt/claw-crew/.env` (and Matt's Mac at `~/claw-crew/.env`).
-  `.env` files are gitignored — never commit or print them.
-- Roster/source of truth: `config/roster.yaml` — 17 members, roles, personas,
-  models. Notable: **Kramer = Automation (n8n) & Discovery** (owns n8n
-  workflows), Mickey = Quality Control, Bania = Test Automation,
-  Lloyd = Strategy, Jerry = Coordinator.
+- **19 agents**, each its own Slack Socket Mode app with its own
+  `xoxb-`/`xapp-` tokens in `/opt/claw-crew/.env` (and Matt's Mac at
+  `~/claw-crew/.env`). `.env` files are gitignored — never commit or print.
+- Roster/source of truth: `config/roster.yaml` — 19 members with Matt's
+  APPROVED ORG CHART (2026-07-04, via `reports_to`): **Jerry = President &
+  Coordinator**; VPs: **Elaine (Marketing)**, **Whatley (Operations)**,
+  **Frank (Revenue)**. Notable: **Kramer = n8n, Automation & AI Frameworks
+  Owner** (inherited Blake's AI-framework playbook; Blake's IT half went to
+  Morty — full archive in `docs/blake-knowledge.md`), Bania = Graphic &
+  Visual Design, Mickey = QA & Test Automation, Puddy = Research & Intel
+  (deliberately unchanged lane), Davola = Traffic Coordinator, **Morty =
+  Infrastructure, IT & Web Development** (web/HTML/Python capability lives
+  with him). Sue-Ellen is BENCHED (web dev asks → @morty until she's
+  activated). Do not change roles or hierarchy without Matt.
 
 ## Deliberate design decisions — DO NOT UNDO
 
@@ -64,9 +73,14 @@ deliberately **deactivated** — do not reactivate or re-invite them.
 4. **Persistent memory:** each agent persists conversation history to
    `data/<handle>.json` (bounded, 12 turns/key; `CLAW_CREW_DATA_DIR` points
    at a Docker volume on the VPS). Threads inherit parent-channel history.
-5. **Crew directory in prompts:** every agent's system prompt lists all 17
-   handles/roles with a "never invent names" rule. Standing fact: Matt
-   Martelli is the boss/CEO.
+5. **Crew directory in prompts (v2, 2026-07-04 PM):** every agent's system
+   prompt lists all 19 handles/roles **plus reports_to lines**, with real
+   Slack user IDs resolved at startup via auth.test (mentions ping despite
+   suffixed usernames) and a "never invent names" rule
+   (`CrewConfig.directory_block` / `system_prompt_for`). Verified live:
+   Jerry routes n8n→@kramer, graphics→@bania, traffic→@davola. Do not revert
+   to the 17-agent flat version. Standing fact: Matt Martelli is the
+   boss/CEO.
 6. **Slack app manifests** (`claw-crew manifest` / `slack-bootstrap`) include
    the Messages tab (DM-ability), Socket Mode, and `channels:manage`. The
    ledger `slack-apps.json` (local, gitignored) prevents duplicate app
@@ -77,8 +91,11 @@ deliberately **deactivated** — do not reactivate or re-invite them.
 ## Operations quick reference
 
 - Crew (VPS): `cd /opt/claw-crew && docker compose ...` (logs/restart/rebuild).
-  Deploy = pull latest `main` into /opt/claw-crew, `docker compose up -d
-  --build`.
+  `/opt/claw-crew` is **rsync-managed (no .git)**. Deploy = merge to `main`,
+  then `rsync -az --exclude .git --exclude .env --exclude data
+  --exclude OVERNIGHT_REPORT.md ~/claw-crew/ root@VPS:/opt/claw-crew/` and
+  `docker compose up -d --build`. Never rsync/overwrite `.env` or `data/`.
+  Content == `main` as of 2026-07-04 PM.
 - Crew CLI: `claw-crew list | doctor | manifest | slack-bootstrap | provision
   | leave | nightly | run` (env from `.env` first).
 - Platform: `docker logs openclaw-openclaw-1`, config via its own CLI, state
@@ -88,11 +105,13 @@ deliberately **deactivated** — do not reactivate or re-invite them.
 
 ## Known open items (safe to pick up)
 
-- Rebuild the crew container so PR #8 (crew directory) is live, if not
-  already done.
-- Locate the original org/roles document ("who reports to who") — likely in
-  the OpenClaw platform's wiki/state or the "GrowthMindset - Core" shared
-  Drive — and fold hierarchy into `roster.yaml`.
+- ~~Rebuild the crew container for the crew directory~~ **DONE 2026-07-04 PM**
+  (enhanced v2 directory live, 19/19 agents, verified via live routing tests).
+- ~~Locate the original org/roles document and fold hierarchy into
+  roster.yaml~~ **DONE 2026-07-04 PM** — it was distributed across
+  `/opt/openclaw/state/agents/<name>/AGENTS.md` (pull archived at
+  `docs/openclaw-org-pull.md`); Matt approved the 3-VP org, now in
+  `roster.yaml` via `reports_to` (decision sheet: `docs/crew-review-2026-07-04.md`).
 - 3 flagged platform crons (Jerry Facilitator 2h → daily, disable malformed
   war-room-facilitator, fix "8AM Standup" timezone) — decisions approved by
   Matt, may or may not be applied yet.
