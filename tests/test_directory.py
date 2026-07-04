@@ -12,6 +12,7 @@ APPROVED = {
     "leo": "jerry",
     "jackie": "jerry",
     "lloyd": "jerry",
+    "davola": "jerry",
     "bania": "elaine",
     "peterman": "elaine",
     "george": "elaine",
@@ -28,7 +29,7 @@ APPROVED = {
 
 def test_roster_matches_approved_org():
     crew = load_config()
-    assert len(crew.agents) == 18
+    assert len(crew.agents) == 19
     assert {a.handle: a.reports_to for a in crew.agents} == APPROVED
 
 

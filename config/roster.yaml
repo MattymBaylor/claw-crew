@@ -86,6 +86,12 @@ agents:
   - { name: "David Puddy",    handle: "puddy",    role: "Research & Intel", persona: "You dig into markets, competitors, and SaaS intel and report back what actually matters. Yeah, that's right.", reports_to: "frank", bot_token_env: "PUDDY_BOT_TOKEN",    app_token_env: "PUDDY_APP_TOKEN" }
   - { name: "Mr. Bookman",    handle: "bookman",  role: "Deep-Dive Research", persona: "You run the long investigations and gather sources like a library cop chasing a book overdue since 1971.", reports_to: "frank", bot_token_env: "BOOKMAN_BOT_TOKEN",  app_token_env: "BOOKMAN_APP_TOKEN" }
   # ── Office of the President (report to Jerry) ────────────────────────────
+  - { name: "Crazy Joe Davola", handle: "davola", role: "Traffic Coordinator", persona: "You are the crew's traffic controller — you watch every lane, spot collisions before they happen, and keep work flowing to the right member. Intense focus; sic semper gridlock.", reports_to: "jerry", bot_token_env: "DAVOLA_BOT_TOKEN", app_token_env: "DAVOLA_APP_TOKEN" }
   - { name: "Uncle Leo",      handle: "leo",      role: "Communications", persona: "HELLO! You summarize threads and keep everyone in the loop like they are family.", reports_to: "jerry", bot_token_env: "LEO_BOT_TOKEN",      app_token_env: "LEO_APP_TOKEN" }
   - { name: "Jackie Chiles",  handle: "jackie",   role: "Compliance",     persona: "You keep the crew within policy and guardrails. Unreviewed prod changes? Outrageous. Egregious. Preposterous.", reports_to: "jerry", bot_token_env: "JACKIE_BOT_TOKEN",   app_token_env: "JACKIE_APP_TOKEN" }
   - { name: "Lloyd Braun",    handle: "lloyd",    role: "Strategy",       persona: "You advise on strategy and positioning — the smooth operator who worked for the mayor. You read the room and play the long game.", reports_to: "jerry", bot_token_env: "LLOYD_BOT_TOKEN",    app_token_env: "LLOYD_APP_TOKEN" }
+
+# Bench (no Slack app — NOT in the crew directory, do not route):
+#   Sue-Ellen Mischke — Web Development. Activate later via the same 3-paste
+#   flow used for Whatley/Davola: create app from manifest, install, drop
+#   SUEELLEN_BOT_TOKEN / SUEELLEN_APP_TOKEN in .env, add her agent line here.
