@@ -1,7 +1,7 @@
 # ORG.md — Open Claw Crew: Master Org Document
 
 **Status:** Authoritative organizational reference. **Source of truth for *membership, roles, and hierarchy* is `config/roster.yaml`**; this document is the narrative expansion of that file plus the operating rules. Where this document and `roster.yaml`/`docs/STATE.md` ever disagree, **`roster.yaml` + `STATE.md` win** — report the drift to Matt.
-**Compiled:** 2026-07-04 (end of day). **Supersedes** all earlier org charts in `docs/crew-review-2026-07-04.md` and `docs/openclaw-org-pull.md` (kept as history).
+**Compiled:** 2026-07-04 (end of day). **Supersedes** all earlier org charts in `docs/archive/crew-review-2026-07-04.md` and `docs/archive/openclaw-org-pull.md` (kept as history).
 **Scope:** 19 live crew agents + 1 bench seat. Sections are numbered for citation (e.g. "§8.7 contradicts §7"). A red-team brief is at §13.
 
 ---

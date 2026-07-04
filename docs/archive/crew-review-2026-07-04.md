@@ -13,7 +13,7 @@
 | Role source | `/opt/openclaw/state/agents/<name>/AGENTS.md` | `config/roster.yaml` (single source of truth) |
 | Status | cron lanes half-broken (see §4) | 17/17 connected, healthy |
 
-The org/roles "document" Matt remembered = the distributed per-agent AGENTS.md files on the VPS (pulled to `docs/openclaw-org-pull.md`).
+The org/roles "document" Matt remembered = the distributed per-agent AGENTS.md files on the VPS (pulled to `docs/archive/openclaw-org-pull.md`).
 
 ## 2. APPROVED org chart (18 — Whatley restored as VP Ops)
 

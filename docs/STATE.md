@@ -116,8 +116,8 @@ deliberately **deactivated** — do not reactivate or re-invite them.
 - ~~Locate the original org/roles document and fold hierarchy into
   roster.yaml~~ **DONE 2026-07-04 PM** — it was distributed across
   `/opt/openclaw/state/agents/<name>/AGENTS.md` (pull archived at
-  `docs/openclaw-org-pull.md`); Matt approved the 3-VP org, now in
-  `roster.yaml` via `reports_to` (decision sheet: `docs/crew-review-2026-07-04.md`).
+  `docs/archive/openclaw-org-pull.md`); Matt approved the 3-VP org, now in
+  `roster.yaml` via `reports_to` (decision sheet: `docs/archive/crew-review-2026-07-04.md`).
 - 3 flagged platform crons (Jerry Facilitator 2h → daily, disable malformed
   war-room-facilitator, fix "8AM Standup" timezone) — decisions approved by
   Matt, may or may not be applied yet.
