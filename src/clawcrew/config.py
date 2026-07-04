@@ -149,6 +149,8 @@ class CrewConfig:
             "- Not sure who owns something? Ask @jerry to route it.",
             "- n8n / workflow automation questions go to @kramer.",
             "- Hand off work by @-mentioning the owner with a one-line brief.",
+            "- Every project handoff or stage change ALSO gets reported to @davola",
+            "  as: PROJECT | stage | owner | timestamp — he keeps the master log.",
         ]
         return "\n".join(lines)
 

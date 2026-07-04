@@ -54,10 +54,16 @@ deliberately **deactivated** — do not reactivate or re-invite them.
   Owner** (inherited Blake's AI-framework playbook; Blake's IT half went to
   Morty — full archive in `docs/blake-knowledge.md`), Bania = Graphic &
   Visual Design, Mickey = QA & Test Automation, Puddy = Research & Intel
-  (deliberately unchanged lane), Davola = Traffic Coordinator, **Morty =
+  (deliberately unchanged lane), Davola = Traffic Coordinator (project-log
+  protocol: every handoff reports "PROJECT | stage | owner | timestamp" to
+  @davola — baked into every agent's directory routing rules; master log =
+  Matt's traffic-log Google Sheet), **Morty =
   Infrastructure, IT & Web Development** (web/HTML/Python capability lives
-  with him). Sue-Ellen is BENCHED (web dev asks → @morty until she's
-  activated). Do not change roles or hierarchy without Matt.
+  with him). Gap closure approved 2026-07-04 PM: Leo = Communications &
+  Customer Success, Elaine adds Paid Acquisition, George adds Finance
+  Tracking, Kramer adds Voice Agent Builds (Babu keeps QA). Sue-Ellen is
+  BENCHED (web dev asks → @morty until she's activated). Do not change roles
+  or hierarchy without Matt.
 
 ## Deliberate design decisions — DO NOT UNDO
 
