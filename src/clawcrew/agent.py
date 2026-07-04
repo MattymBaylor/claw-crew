@@ -54,6 +54,11 @@ class ClawAgent:
         claude = self._claude()
 
         def respond(event: dict, say) -> None:
+            # Never engage with bot-authored messages. The whole crew plus the
+            # OpenClaw gateway share every room, so bot-to-bot replies can
+            # cascade into mention loops that burn API credits.
+            if event.get("bot_id") or event.get("subtype") == "bot_message":
+                return
             prompt = _strip_mentions(event.get("text", ""))
             if not prompt:
                 return
@@ -75,8 +80,9 @@ class ClawAgent:
 
         @app.event("message")
         def _on_message(event, say):
-            # Only auto-reply to direct messages; channel chatter needs a mention.
-            if event.get("channel_type") == "im" and not event.get("bot_id"):
+            # Only auto-reply to direct messages; channel chatter needs a
+            # mention. Bot-authored traffic is filtered inside respond().
+            if event.get("channel_type") == "im":
                 respond(event, say)
 
         self._app = app
